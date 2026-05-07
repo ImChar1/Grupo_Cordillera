@@ -1,13 +1,14 @@
 package com.cordillera.ms_inventario.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import jakarta.persistence.*;
+import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
@@ -18,6 +19,8 @@ import lombok.NoArgsConstructor;
 public class ProductoModel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
+
     private String nombre;
     private String descripcion;
     private String categoria;
@@ -35,6 +38,7 @@ public class ProductoModel {
     @UpdateTimestamp
     private LocalDateTime fechaActualizacion;
 
+    @Builder.Default
     private Boolean activo = true;
 
 }
