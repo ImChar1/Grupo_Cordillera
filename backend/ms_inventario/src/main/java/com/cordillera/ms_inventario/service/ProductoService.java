@@ -4,8 +4,6 @@ import com.cordillera.ms_inventario.model.ProductoModel;          // ← falta
 import com.cordillera.ms_inventario.repository.ProductoRepository; // ← falta
 import lombok.RequiredArgsConstructor;                             // ← falta
 import org.springframework.stereotype.Service;
-import java.util.List;
-import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
