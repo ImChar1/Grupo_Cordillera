@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
+
 interface NavbarProps {
   isLogged: boolean;
   user: any;
@@ -19,10 +20,11 @@ export const NavbarComponent: React.FC<NavbarProps> = ({ isLogged, user, logout,
   return (
     <nav className="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm sticky-top">
       <div className="container">
-        <Link className="navbar-brand fw-bold text-success" style={{ fontSize: '1.5rem' }} to="/">
-          🌿 EcoMarket
+        <Link className="navbar-brand" to="/">
+          <img src="/img/logo-claro.png" style={{ width: 100 }} alt="Logo" />
         </Link>
-        
+
+
         <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
           <span className="navbar-toggler-icon"></span>
         </button>
@@ -30,7 +32,7 @@ export const NavbarComponent: React.FC<NavbarProps> = ({ isLogged, user, logout,
         <div className="collapse navbar-collapse" id="navbarNav">
           <ul className="navbar-nav ms-auto align-items-center">
             <li className="nav-item">
-              <Link className="nav-link" to="/">Catálogo</Link>
+              <Link className="nav-link" to="/Catalogo">Catálogo</Link>
             </li>
             
             <li className="nav-item me-3">
