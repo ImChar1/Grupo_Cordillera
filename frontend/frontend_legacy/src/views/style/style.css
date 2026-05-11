@@ -1,0 +1,556 @@
+/* =========================================================
+   PERFIL
+   ---------------------------------------------------------
+   Contenedor general del componente de perfil.
+   Controla tipografía base, centrado en pantalla y layout
+   de la tarjeta de usuario.
+   ========================================================= */
+
+.Perfil{
+
+    /* Fuente base del componente */
+    .html{
+        font-family: 'Segoe UI';
+    }
+
+    /* Contenedor principal:
+       - Flexbox
+       - Centrado horizontal y vertical
+       - Área visual del perfil */
+    .container{
+        width: 100%;
+        height: 900px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border: 1px solid black;
+    }
+
+    /* Tarjeta del perfil:
+       - Estructura vertical
+       - Fondo oscuro
+       - Diseño tipo card */
+    .carta{
+        width: 450px;
+        border: 1px solid black;
+        border-radius: 10px;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        background: rgb(26,26,26);
+        color: rgb(240, 240, 240);
+    }
+
+    /* Imagen de fondo de la tarjeta:
+       - Superposición
+       - Control de capas visuales */
+    .fondoCarta{
+        margin-top: -7rem;
+        width: 500px;
+        height: auto;
+        z-index: 1;
+    }
+
+    /* Foto de perfil:
+       - Posicionada sobre el fondo
+       - Efecto de superposición
+       - Forma circular */
+    .fotoPerfil{
+        position: relative;
+        margin-top: -4.5rem;
+        border-radius: 80px;
+        width: 150px;
+        border: 2px solid black;
+        z-index: 2;
+    }
+
+    /* Nombre del perfil */
+    .carta p:nth-child(3){
+        margin-top: 0.5rem;
+        font-size: 25px;
+        font-weight: bold;
+    }
+
+    /* Subtítulo del perfil */
+    .carta p:nth-child(4){
+        font-size: 20px;
+        margin-top: -24px;
+    }
+}
+
+
+/* =========================================================
+   BOTÓN DE CATEGORÍA ACTIVO
+   ---------------------------------------------------------
+   Estilo visual del filtro activo en catálogo
+   ========================================================= */
+
+.btn-categoria.active {
+    background-color: #198754;
+    color: white;
+}
+
+
+/* =========================================================
+   NAVBAR BASE
+   ---------------------------------------------------------
+   Estilo principal de la barra de navegación
+   ========================================================= */
+
+.navbar{
+  background: linear-gradient(90deg, #0f3d2e, #1b5e4b);
+  padding-top: 4px !important;    /* Reduce el margen verde superior */
+  padding-bottom: 4px !important; /* Reduce el margen verde inferior */
+}
+
+
+/* =========================================================
+   CONTENEDOR GENERAL NAVBAR
+   ---------------------------------------------------------
+   Layout principal del contenido del navbar
+   Organización izquierda / derecha
+   ========================================================= */
+
+#navbarSupportedContent{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+
+/* =========================================================
+   SECCIÓN IZQUIERDA NAVBAR
+   ---------------------------------------------------------
+   Contiene buscador y carrito
+   ========================================================= */
+
+.nav-left{
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+
+/* =========================================================
+   BUSCADOR
+   ---------------------------------------------------------
+   Contenedor del input + botón de búsqueda
+   ========================================================= */
+
+.search-box{
+  display: flex;
+  align-items: center;
+  background: #f1faf6;
+  border-radius: 30px;
+  padding: 4px;
+  border: 1px solid #b7e1cd;
+}
+
+
+/* =========================================================
+   BOTÓN DE BÚSQUEDA
+   ---------------------------------------------------------
+   Botón circular con animación hover
+   ========================================================= */
+
+.btn-search{
+  background: #2e8b6f;
+  border: none;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 50%;
+  transition: 0.3s;
+}
+
+.btn-search:hover{
+  background: #256f59;
+  transform: scale(1.05);
+}
+
+
+/* =========================================================
+   INPUT DE BÚSQUEDA
+   ---------------------------------------------------------
+   Campo de texto principal del buscador
+   ========================================================= */
+
+.search-input{
+  border: none;
+  outline: none;
+  background: transparent;
+  padding: 8px 12px;
+  width: 100%;         /* Se adapta al espacio disponible */
+  max-width: 600px;    /* No crecerá más de 600px en pantallas grandes */
+  color: #1f4033;
+}
+
+.search-input::placeholder{
+  color: #5f8f7b;
+}
+
+
+/* ======================
+   CARRITO SIMPLE
+====================== */
+
+.carrito-item {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 12px 0;
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.carrito-item img {
+  width: 60px;
+  height: 60px;
+  object-fit: contain;
+  background: #f6f6f6;
+  border-radius: 8px;
+  padding: 5px;
+}
+
+.carrito-item .info {
+  flex-grow: 1;
+}
+
+.carrito-item .precio {
+  font-size: 14px;
+  color: #666;
+}
+
+.carrito-item input {
+  width: 60px;
+  text-align: center;
+}
+
+.btn-remove {
+  border: none;
+  background: transparent;
+  color: #dc3545;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.carrito-footer {
+  margin-top: 25px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.carrito-footer .acciones {
+  display: flex;
+  gap: 10px;
+}
+
+
+/* =========================================================
+   MENÚ DERECHO NAVBAR
+   ---------------------------------------------------------
+   Links de navegación
+   ========================================================= */
+
+.nav-right{
+  display: flex;
+  align-items: center;
+  gap: 25px;
+}
+
+.nav-right .nav-link{
+  color: #e8fff6 !important;
+  font-weight: 500;
+  transition: 0.3s;
+  padding-top: 4px !important;    /* Reduce el espacio vertical del enlace */
+  padding-bottom: 4px !important; /* Reduce el espacio vertical del enlace */
+}
+
+.nav-right .nav-link:hover{
+  color: #b7ffe3 !important;
+  transform: translateY(-1px);
+}
+
+
+/* =========================================================
+   DROPDOWN
+   ---------------------------------------------------------
+   Menú desplegable del navbar
+   ========================================================= */
+
+.dropdown-menu{
+  background: #f1faf6;
+  border-radius: 12px;
+  border: 1px solid #b7e1cd;
+}
+
+.dropdown-item:hover{
+  background: #dff5ec;
+  color: #1f4033;
+}
+
+
+/* =========================================================
+   RESPONSIVE NAVBAR
+   ---------------------------------------------------------
+   Adaptación mobile / tablet
+   ========================================================= */
+
+@media (max-width: 991px){
+
+  #navbarSupportedContent{
+    flex-direction: column;
+    align-items: stretch;
+    gap: 15px;
+  }
+
+  .nav-left{
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .search-input{
+    width: 100%;
+  }
+
+  .search-box{
+    flex: 1;
+  }
+
+  .nav-right{
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+}
+
+
+/* =========================================================
+   LINKS GENERALES
+   ---------------------------------------------------------
+   Estilo base para etiquetas <a>
+   ========================================================= */
+
+a{
+    text-decoration: none;
+    color: black;
+}
+
+
+/* =========================================================
+   Login y boton
+   ---------------------------------------------------------
+   Contenedor del input + botón de búsqueda
+   ========================================================= */
+
+.Login-box{
+  display: flex;
+  align-items: center;
+  background: #f1faf6;
+  border-radius: 30px;
+  padding: 8px;
+  border: 8px solid #b7e1cd;
+}
+
+.login-btn{
+  display: flex;
+  align-items: center;
+  background: #3fa87e;
+  border-radius: 30px;
+  padding: 8px;
+}
+
+/*Home*/
+.home-hero-text h1 {
+  font-weight: 600;
+}
+
+.home-hero-text p {
+  color: #555;
+}
+
+section, .container {
+  margin-bottom: 4rem;
+}
+
+/* ==========================
+   SOBRE NOSOTROS - HOME
+========================== */
+
+.nosotros-home {
+  position: relative;
+  background-image: url("/public/Productos-nat.png");
+  background-size: cover;
+  background-position: center;
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.nosotros-overlay {
+  background: rgba(15, 61, 46, 0.78);
+  padding: 60px 40px;
+  height: 100%;
+}
+
+.nosotros-home::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    rgba(18, 58, 42, 0.3),  /* verde muy sutil */
+    rgba(18, 58, 42, 0.3)
+  );
+  z-index: 1;
+}
+
+.nosotros-content {
+  position: relative;
+  z-index: 2;
+  color: #ffffff;
+  padding: 20px;
+  background-color: rgba(0, 0, 0, 0.25); /* negro muy suave */
+  border-radius: 12px;
+}
+
+.nosotros-content h2 {
+  font-size: 2.4rem;
+  font-weight: 700;
+  margin-bottom: 15px;
+  color: #ffffff;
+}
+
+.nosotros-content p,
+.nosotros-content li {
+  color: #f9f9f9;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.nosotros-btn {
+  background: #ffffff;
+  color: #1b5e43;
+  padding: 10px 22px;
+  border-radius: 12px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.nosotros-btn:hover {
+  background: #e6f4ee;
+  transform: translateY(-2px);
+}
+
+.nosotros-content ul {
+  list-style: none;
+  padding: 0;
+  margin-top: 15px;
+}
+
+/* =========================
+   CONTENEDOR LOGIN / REGISTRO
+   ========================= */
+.auth-wrapper {
+  min-height: 80vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* CARD */
+.auth-card {
+  background: #A4E5D2;
+  width: 100%;
+  max-width: 520px;
+  padding: 40px;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+}
+
+
+/* =========================
+   INPUTS CON ICONOS
+   ========================= */
+.input-icon-wrapper {
+  position: relative;
+  width: 50%;
+  margin: 0 auto 1rem auto;
+}
+
+.input-icon {
+  position: absolute;
+  top: 50%;
+  left: 18px;
+  transform: translateY(-50%);
+  color: #2f6b57;
+  font-size: 1rem;
+}
+
+/* input base */
+.Login-box {
+  width: 100%;
+  border-radius: 30px;
+  border: none;
+  padding: 12px 18px;
+  outline: none;
+  font-size: 0.95rem;
+  background: #f4fff9;
+}
+
+/* espacio para el icono */
+.input-with-icon {
+  padding-left: 45px;
+}
+
+/* focus elegante */
+.Login-box:focus {
+  box-shadow: 0 0 0 2px rgba(47, 107, 87, 0.25);
+}
+
+/* =========================
+   BOTÓN LOGIN
+   ========================= */
+.login-btn {
+  border-radius: 25px;
+  padding: 10px 45px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+/* =========================
+   TEXTO ERROR
+   ========================= */
+.error-text {
+  color: #b02a37;
+  text-align: center;
+  font-size: 0.9rem;
+  margin-top: 10px;
+}
+
+.btn-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;               /* espacio entre icono y texto */
+  padding: 10px 18px;
+  font-weight: 600;
+  border-radius: 10px;
+  transition: all 0.2s ease;
+}
+
+.btn-icon svg {
+  font-size: 1rem;
+}
+
+.btn-icon:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+
+.general-icon {
+  color: #2f6b57;
+}

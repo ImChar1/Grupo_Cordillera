@@ -1,0 +1,51 @@
+.pago-container {
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 30px;
+}
+
+.pago-card {
+  background: #f5f9f7;
+  padding: 20px;
+  border-radius: 12px;
+  margin-bottom: 25px;
+}
+
+.pago-opciones {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.opcion-btn {
+  padding: 10px 16px;
+  border-radius: 8px;
+  border: 2px solid #1f7a55;
+  background: white;
+  cursor: pointer;
+}
+
+.opcion-btn.active {
+  background: #1f7a55;
+  color: white;
+}
+
+.pago-resumen {
+  margin-top: 20px;
+  font-size: 16px;
+}
+
+.btn-confirmar {
+  margin-top: 30px;
+  padding: 14px;
+  width: 100%;
+  background: #1f7a55;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 18px;
+}
+.btn-confirmar:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
