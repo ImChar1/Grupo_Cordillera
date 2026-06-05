@@ -1,6 +1,6 @@
 const API_URL = 'http://localhost:8080/api/v1/productos'
 
-export const ProductoService = {
+export const ProductService = {
     getAll: async () => {
         const res = await fetch(API_URL)
         return res.json()

@@ -17,7 +17,7 @@ import { HistorialView } from './views/HistorialView';
 
 import { useCartViewModel } from './viewmodels/useCartViewModel';
 import { useUserViewModel } from './viewmodels/useUserViewModel';
-import { ProductoService } from './services/ProductoService'; // ✅ nuevo service
+import { ProductoService } from './services/ProductService'; // ✅ nuevo service
 
 const App = () => {
   const { cart, total, addToCart, removeFromCart, updateCantidad, clearCart } = useCartViewModel();
