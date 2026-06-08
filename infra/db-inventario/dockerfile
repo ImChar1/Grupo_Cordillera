@@ -1,0 +1,6 @@
+FROM mariadb:11
+
+COPY infra/db/script_DDL.sql  /docker-entrypoint-initdb.d/01_schema.sql
+COPY infra//db/script_DML.sql /docker-entrypoint-initdb.d/02_seed.sql
+
+VOLUME /var/lib/mysql
