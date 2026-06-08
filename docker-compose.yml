@@ -1,0 +1,94 @@
+version: '3.8'
+
+services:
+  # ==========================================
+  # 1. BASE DE DATOS: INVENTARIO
+  # ==========================================
+  db-inventario:
+    build: ./infra/db-inventario
+    container_name: mariadb-inventario
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: bd_cordillera_inventario
+    ports:
+      - "3306:3306" # Expuesto al puerto 3306 de tu PC
+    volumes:
+      - inventario_data:/var/lib/mysql
+
+  # ==========================================
+  # 2. BASE DE DATOS: USUARIOS/VENTAS
+  # ==========================================
+  db-usuarios:
+    build: ./infra/db-usuarios
+    container_name: mariadb-usuarios
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: bd_cordillera_usuarios
+    ports:
+      - "3307:3306" # OJO: Expuesto al puerto 3307 para que no choque con el otro
+    volumes:
+      - usuarios_data:/var/lib/mysql
+
+  # ==========================================
+  # 3. MICROSERVICIO: INVENTARIO
+  # ==========================================
+  ms-inventario:
+    build: ./ms-inventario
+    container_name: ms-inventario
+    ports:
+      - "8081:8081"
+    environment:
+      # Apunta al nombre del contenedor de inventario
+      - SPRING_DATASOURCE_URL=jdbc:mysql://db-inventario:3306/bd_cordillera_inventario
+      - SPRING_DATASOURCE_PASSWORD=root
+      - DB_HOST=db-inventario
+    depends_on:
+      - db-inventario
+
+  # ==========================================
+  # 4. MICROSERVICIO: USUARIOS
+  # ==========================================
+  ms-usuarios:
+    build: ./ms-usuarios
+    container_name: ms-usuarios
+    ports:
+      - "8082:8082"
+    environment:
+      # Apunta al nombre del contenedor de usuarios
+      - SPRING_DATASOURCE_URL=jdbc:mysql://db-usuarios:3306/bd_cordillera_usuarios
+      - SPRING_DATASOURCE_PASSWORD=root
+      - DB_HOST=db-usuarios
+    depends_on:
+      - db-usuarios
+
+  # ==========================================
+  # 5. API GATEWAY
+  # ==========================================
+  api-gateway:
+    build: ./api-gateway
+    container_name: api-gateway
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_CLOUD_GATEWAY_ROUTES_0_URI=http://ms-inventario:8081
+      - SPRING_CLOUD_GATEWAY_ROUTES_1_URI=http://ms-usuarios:8082
+    depends_on:
+      - ms-inventario
+      - ms-usuarios
+  
+  # ==========================================
+  # 5. FRONTEND (react/Vite)
+  # ==========================================
+  frontend:
+    build: ./frontend # La ruta a tu carpeta frontend
+    container_name: frontend_react
+    ports:
+      # Mapeamos el puerto 3000 de tu PC al puerto 80 del Nginx
+      - "3000:80" 
+    depends_on:
+      - api-gateway
+      
+# Volúmenes nombrados independientes
+volumes:
+  inventario_data:
+  usuarios_data:
