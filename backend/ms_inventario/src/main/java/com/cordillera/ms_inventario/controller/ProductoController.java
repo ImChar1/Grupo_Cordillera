@@ -12,7 +12,7 @@ import com.cordillera.ms_inventario.service.ProductoService;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/v1/productos")
+@RequestMapping("/productos")
 @RequiredArgsConstructor  // ✅ en vez de @Autowired
 public class ProductoController {
 
