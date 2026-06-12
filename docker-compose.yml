@@ -8,8 +8,10 @@ services:
     build: ./infra/db-inventario
     container_name: mariadb-inventario
     environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: bd_cordillera_inventario
+      MARIADB_ROOT_PASSWORD: ${DB_INVENTARIO_ROOT_PASSWORD}
+      MARIADB_DATABASE: ${DB_INVENTARIO_NAME}
+      MARIADB_USER: ${DB_INVENTARIO_USER}
+      MARIADB_PASSWORD: ${DB_INVENTARIO_PASSWORD}
     ports:
       - "3306:3306" # Expuesto al puerto 3306 de tu PC
     volumes:
@@ -22,8 +24,10 @@ services:
     build: ./infra/db-usuarios
     container_name: mariadb-usuarios
     environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: bd_cordillera_usuarios
+      MARIADB_ROOT_PASSWORD: ${DB_USUARIOS_ROOT_PASSWORD}
+      MARIADB_DATABASE: ${DB_USUARIOS_NAME}
+      MARIADB_USER: ${DB_USUARIOS_USER}
+      MARIADB_PASSWORD: ${DB_USUARIOS_PASSWORD}
     ports:
       - "3307:3306" # OJO: Expuesto al puerto 3307 para que no choque con el otro
     volumes:
@@ -39,9 +43,10 @@ services:
       - "8081:8081"
     environment:
       # Apunta al nombre del contenedor de inventario
-      - SPRING_DATASOURCE_URL=jdbc:mysql://db-inventario:3306/bd_cordillera_inventario
-      - SPRING_DATASOURCE_PASSWORD=root
-      - DB_HOST=db-inventario
+      DB_URL: jdbc:mariadb://db_inventario:3306/${DB_INVENTARIO_NAME}
+      DB_USER: ${DB_INVENTARIO_USER}
+      DB_PASSWORD: ${DB_INVENTARIO_PASSWORD}
+      SWAGGER_ENABLED: ${SWAGGER_ENABLED:-true}
     depends_on:
       - db-inventario
 
@@ -55,9 +60,10 @@ services:
       - "8082:8082"
     environment:
       # Apunta al nombre del contenedor de usuarios
-      - SPRING_DATASOURCE_URL=jdbc:mysql://db-usuarios:3306/bd_cordillera_usuarios
-      - SPRING_DATASOURCE_PASSWORD=root
-      - DB_HOST=db-usuarios
+      DB_URL: jdbc:mariadb://db-usuarios:3306/${DB_USUARIOS_NAME}
+      DB_USER: ${DB_USUARIOS_USER}
+      DB_PASSWORD: ${DB_USUARIOS_PASSWORD}
+      SWAGGER_ENABLED: ${SWAGGER_ENABLED:-true}
     depends_on:
       - db-usuarios
 
