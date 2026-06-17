@@ -14,6 +14,21 @@ public class UsuarioService {
     private final UsuarioRepository usuarioRepository;
     private final PasswordEncoder passwordEncoder; // ✅ Inyectamos el encriptador de contraseñas de Spring Security
 
+    // 🔥 NUEVO: Método de Login
+    public UsuarioModel login(String email, String passwordPlana) {
+        // 1. Buscamos al usuario por correo verificando de inmediato que esté ACTIVO
+        UsuarioModel usuario = usuarioRepository.findByEmailAndActivoTrue(email)
+            .orElseThrow(() -> new RuntimeException("Credenciales inválidas o el usuario no existe/está inactivo."));
+
+        // 2. Comparamos la contraseña enviada con la encriptada en la BD
+        if (!passwordEncoder.matches(passwordPlana, usuario.getPassword())) {
+            throw new RuntimeException("Credenciales inválidas.");
+        }
+
+        // 3. Si todo es correcto, devolvemos el usuario
+        return usuario;
+    }
+
     // Obtener todos los usuarios activos (trabajadores actuales)
     public List<UsuarioModel> getUsuarios() {
         return usuarioRepository.findByActivoTrue();
