@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
+import { AuthService } from '../services/AuthService'; // 🔥 IMPORTAMOS EL SERVICIO DE API
 
 // ── Paleta (coherente con HomeView / NavbarComponent / FooterComponent) ────
 const C = {
@@ -19,13 +20,26 @@ export const LoginView = ({ onLogin }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [errorMsg, setErrorMsg] = useState(''); // 🔥 NUEVO: Para mostrar errores del backend
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  // 🔥 NUEVO: Función handleSubmit conectada al backend real
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setErrorMsg(''); // Limpiamos errores anteriores
+
     if (email && password) {
-      onLogin({ nombre: 'Usuario Eco', email });
-      navigate('/');
+      try {
+        // Hacemos la petición POST al Gateway (8080)
+        const response = await AuthService.login({ email, password });
+        
+        // Si el backend responde 200 OK, pasamos los datos reales y redirigimos
+        onLogin(response.user);
+        navigate('/');
+      } catch (error) {
+        // Si el backend tira un 401 (Credenciales inválidas), lo mostramos en pantalla
+        setErrorMsg(error.message);
+      }
     }
   };
 
@@ -67,8 +81,7 @@ export const LoginView = ({ onLogin }) => {
         .cordi-submit:hover { background: ${C.green2}; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(45,106,79,0.34); }
 
         .cordi-text-link {
-          position: relative; color: ${C.green}; font-weight: 700;
-          text-decoration: none;
+          position: relative; color: ${C.green}; font-weight: 700; text-decoration: none;
         }
         .cordi-text-link::after {
           content: ''; position: absolute; left: 0; bottom: -2px;
@@ -84,9 +97,7 @@ export const LoginView = ({ onLogin }) => {
       `}</style>
 
       {/* ── PANEL IZQUIERDO — IMAGEN EDITORIAL (desktop) ─────────────── */}
-      <div className="cordi-login-image" style={{
-        flexBasis: '46%', position: 'relative', overflow: 'hidden',
-      }}>
+      <div className="cordi-login-image" style={{ flexBasis: '46%', position: 'relative', overflow: 'hidden' }}>
         <img
           src="https://images.unsplash.com/photo-1556911220-bff31c812dba?w=1200&q=85"
           alt="Hogar Grupo Cordillera"
@@ -97,9 +108,7 @@ export const LoginView = ({ onLogin }) => {
           background: 'linear-gradient(180deg, rgba(26,26,24,0.35) 0%, rgba(26,26,24,0.15) 40%, rgba(26,26,24,0.82) 100%)',
         }} />
 
-        <Link to="/" style={{
-          position: 'absolute', top: 36, left: 40, display: 'flex', alignItems: 'center', gap: 12, textDecoration: 'none',
-        }}>
+        <Link to="/" style={{ position: 'absolute', top: 36, left: 40, display: 'flex', alignItems: 'center', gap: 12, textDecoration: 'none' }}>
           <div style={{
             width: 40, height: 40, borderRadius: 11,
             background: `linear-gradient(135deg, ${C.green} 0%, ${C.green2} 100%)`,
@@ -113,44 +122,35 @@ export const LoginView = ({ onLogin }) => {
         </Link>
 
         <div style={{ position: 'absolute', bottom: 56, left: 40, right: 40, maxWidth: 420 }}>
-          <p style={{
-            fontFamily: 'Inter, sans-serif', fontSize: 11, fontWeight: 700,
-            letterSpacing: '0.14em', textTransform: 'uppercase', color: C.green2, margin: '0 0 14px 0',
-          }}>
+          <p style={{ fontFamily: 'Inter, sans-serif', fontSize: 11, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: C.green2, margin: '0 0 14px 0' }}>
             Hogar & confort
           </p>
-          <h2 style={{
-            fontFamily: 'Playfair Display, serif', fontSize: 30, fontWeight: 600,
-            color: '#fff', lineHeight: 1.25, margin: 0,
-          }}>
-            Cada hogar cuenta una <em style={{ fontStyle: 'italic', color: C.green2, fontWeight: 400 }}>historia</em>.
-            Que la tuya empiece aquí.
+          <h2 style={{ fontFamily: 'Playfair Display, serif', fontSize: 30, fontWeight: 600, color: '#fff', lineHeight: 1.25, margin: 0 }}>
+            Cada hogar cuenta una <em style={{ fontStyle: 'italic', color: C.green2, fontWeight: 400 }}>historia</em>. Que la tuya empiece aquí.
           </h2>
         </div>
       </div>
 
       {/* ── PANEL DERECHO — FORMULARIO ───────────────────────────────── */}
-      <div className="cordi-login-form" style={{
-        flexBasis: '54%', display: 'flex', alignItems: 'center', justifyContent: 'center',
-        padding: '64px 8vw',
-      }}>
+      <div className="cordi-login-form" style={{ flexBasis: '54%', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '64px 8vw' }}>
         <div style={{ width: '100%', maxWidth: 380 }}>
 
-          <p style={{
-            fontFamily: 'Inter, sans-serif', fontSize: 11, fontWeight: 700,
-            letterSpacing: '0.14em', textTransform: 'uppercase', color: C.muted, margin: '0 0 12px 0',
-          }}>
+          <p style={{ fontFamily: 'Inter, sans-serif', fontSize: 11, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: C.muted, margin: '0 0 12px 0' }}>
             Bienvenido de nuevo
           </p>
-          <h1 style={{
-            fontFamily: 'Playfair Display, serif', fontSize: 34, fontWeight: 600,
-            color: C.ink, margin: '0 0 10px 0',
-          }}>
+          <h1 style={{ fontFamily: 'Playfair Display, serif', fontSize: 34, fontWeight: 600, color: C.ink, margin: '0 0 10px 0' }}>
             Inicia sesión
           </h1>
-          <p style={{ fontSize: 14, color: C.muted, lineHeight: 1.6, margin: '0 0 38px 0' }}>
+          <p style={{ fontSize: 14, color: C.muted, lineHeight: 1.6, margin: '0 0 28px 0' }}>
             Ingresa tus datos para continuar con tu pedido y tu cuenta.
           </p>
+
+          {/* 🔥 BLOQUE DE ERROR: Aparece si el backend nos rechaza */}
+          {errorMsg && (
+            <div style={{ background: '#fdeded', color: '#ef5350', padding: '12px', borderRadius: '6px', marginBottom: '20px', fontSize: '14px', fontWeight: '500', border: '1px solid #ef5350' }}>
+              Error: {errorMsg}
+            </div>
+          )}
 
           <form onSubmit={handleSubmit}>
             <div className="cordi-field">
