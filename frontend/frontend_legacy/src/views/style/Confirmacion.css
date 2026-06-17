@@ -1,0 +1,45 @@
+.confirmacion-container {
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 30px;
+}
+
+.confirmacion-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #1f7a55;
+  font-size: 28px;
+}
+
+.confirmacion-card {
+  background: #f5f9f7;
+  border-radius: 12px;
+  padding: 20px;
+  margin-top: 25px;
+}
+
+.confirmacion-card p {
+  margin: 8px 0;
+  font-size: 16px;
+}
+
+.confirmacion-info {
+  margin-top: 20px;
+  color: #2f5d50;
+}
+
+.btn-volver {
+  margin-top: 30px;
+  padding: 12px 20px;
+  background: #1f7a55;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.btn-volver:hover {
+  background: #166345;
+}

@@ -1,0 +1,20 @@
+# Stage 1: Compilación
+FROM maven:3.9-eclipse-temurin-21 AS builder
+WORKDIR /build
+COPY pom.xml .
+COPY src ./src
+RUN mvn clean package -DskipTests
+
+# Stage 2: Ejecución
+FROM eclipse-temurin:21-jdk
+WORKDIR /app
+
+# Copiamos el jar desde el builder
+COPY --from=builder /build/target/*.jar app.jar
+
+# Exponemos el puerto
+EXPOSE 8080
+
+# ESTA ES LA LÍNEA QUE FALTABA:
+# Aquí le indicamos a Docker que ejecute la aplicación Spring Boot
+ENTRYPOINT ["java", "-jar", "app.jar"]

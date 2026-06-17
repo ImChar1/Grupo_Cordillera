@@ -1,0 +1,81 @@
+.auth-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f5f7f6;
+}
+
+.auth-card {
+  background: #aee9d6;
+  padding: 3rem 4rem;
+  border-radius: 20px;
+  width: 100%;
+  max-width: 520px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+  text-align: center;
+}
+
+.auth-logo {
+  font-size: 2rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+
+.auth-title {
+  font-size: 1.6rem;
+  margin-bottom: 2rem;
+}
+
+.auth-input {
+  width: 100%;
+  border: none;
+  border-radius: 30px;
+  padding: 0.75rem 1.2rem;
+  margin-bottom: 1rem;
+  outline: none;
+}
+
+.auth-input:focus {
+  box-shadow: 0 0 0 2px rgba(0,128,0,0.2);
+}
+
+.auth-phone {
+  display: flex;
+  align-items: center;
+  background: #fff;
+  border-radius: 30px;
+  padding: 0.5rem 1rem;
+  margin-bottom: 1rem;
+}
+
+.auth-phone span {
+  font-weight: bold;
+  margin-right: 0.5rem;
+}
+
+.auth-phone input {
+  border: none;
+  outline: none;
+  width: 100%;
+}
+
+.auth-btn {
+  background: #1e8f5a;
+  color: #fff;
+  border: none;
+  padding: 0.6rem 2rem;
+  border-radius: 10px;
+  margin-top: 1rem;
+  cursor: pointer;
+}
+
+.auth-btn:hover {
+  background: #157047;
+}
+
+.auth-link {
+  margin-top: 1rem;
+  display: block;
+  font-size: 0.9rem;
+}

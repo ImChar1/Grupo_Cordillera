@@ -1,0 +1,57 @@
+.tracking-container{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin:30px 0;
+  width:100%;
+}
+
+.tracking-step{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  position:relative;
+  flex:1;
+}
+
+.tracking-circle{
+  width:38px;
+  height:38px;
+  border-radius:50%;
+  background:#ccc;
+  color:#fff;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:600;
+  z-index:2;
+}
+
+.tracking-circle.active{
+  background:#2e8b6f;
+}
+
+.tracking-label{
+  margin-top:6px;
+  font-size:13px;
+  color:#aaa;
+}
+
+.tracking-label.active{
+  color:#2e8b6f;
+  font-weight:600;
+}
+
+.tracking-line{
+  position:absolute;
+  top:18px;
+  right:-50%;
+  width:100%;
+  height:3px;
+  background:#ccc;
+  z-index:1;
+}
+
+.tracking-line.active{
+  background:#2e8b6f;
+}

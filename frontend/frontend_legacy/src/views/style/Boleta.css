@@ -1,0 +1,81 @@
+.confirmacion-container {
+  max-width: 900px;
+  margin: 32px auto 48px;
+  padding: 24px;
+}
+
+/* TÍTULO */
+.confirmacion-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 28px;
+  font-weight: 600;
+  color: #1f7a5a;
+  margin-bottom: 24px;
+}
+
+.confirmacion-icon {
+  color: #1f7a5a;
+  font-size: 28px;
+}
+
+/* TARJETA RESUMEN */
+.confirmacion-card {
+  margin-top: 24px;
+  background-color: #ffffff;
+  border-radius: 14px;
+  padding: 20px;
+  border: 1px solid #e6f2ed;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px 20px;
+  font-size: 15px;
+}
+
+.confirmacion-card span {
+  font-weight: 600;
+  color: #145c43;
+}
+
+/* INFO EXTRA */
+.confirmacion-info {
+  margin-top: 16px;
+  font-size: 15px;
+  color: #333;
+}
+
+.confirmacion-info p {
+  margin: 6px 0;
+}
+
+/* BOTÓN */
+.confirmacion-btn {
+  margin-top: 28px;
+  padding: 10px 18px;
+  border-radius: 10px;
+  background-color: #1f7a5a;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.confirmacion-btn:hover {
+  background-color: #145c43;
+}
+
+.confirmacion-btn:active {
+  transform: scale(0.97);
+}
+
+/* RESPONSIVE */
+@media (max-width: 600px) {
+  .confirmacion-card {
+    grid-template-columns: 1fr;
+  }
+}
