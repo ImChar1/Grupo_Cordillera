@@ -17,16 +17,19 @@ import { HistorialView } from './views/HistorialView';
 
 import { useCartViewModel } from './viewmodels/useCartViewModel';
 import { useUserViewModel } from './viewmodels/useUserViewModel';
-import { ProductoService } from './services/ProductoService'; // ✅ nuevo service
+import { ProductoService } from './services/ProductoService'; 
 
 const App = () => {
   const { cart, total, addToCart, removeFromCart, updateCantidad, clearCart } = useCartViewModel();
   const { user, isLogged, login, logout } = useUserViewModel();
   const [globalLoading, setGlobalLoading] = useState(false);
-  const [productos, setProductos] = useState([]); // ✅ ahora es estado
+  const [productos, setProductos] = useState([]); 
   const location = useLocation();
 
-  // ✅ Carga productos desde el backend al montar la app
+  // 🚀 SOLUCIÓN REGLA DEL FOOTER: Evaluamos si la ruta actual es exactamente el Home ('/')
+  const esHome = location.pathname === '/';
+
+  // Carga de productos desde el backend
   useEffect(() => {
     const cargarProductos = async () => {
       try {
@@ -39,16 +42,19 @@ const App = () => {
     cargarProductos();
   }, []);
 
+  // Efecto de carga rápido al cambiar de página
   useEffect(() => {
     setGlobalLoading(true);
-    const timer = setTimeout(() => setGlobalLoading(false), 600);
+    const timer = setTimeout(() => setGlobalLoading(false), 200); 
     return () => clearTimeout(timer);
   }, [location.pathname]);
 
   const cartCount = cart.reduce((acc, item) => acc + item.cantidad, 0);
 
   return (
-    <div className="app-wrapper d-flex flex-column" style={{ minHeight: '100vh' }}>
+    <div className="d-flex flex-column min-vh-100 bg-light">
+      
+      {/* NAVBAR COMPONENT (Siempre visible en toda la aplicación) */}
       <NavbarComponent
         isLogged={isLogged}
         user={user}
@@ -57,21 +63,24 @@ const App = () => {
       />
 
       {globalLoading && (
-        <div className="position-fixed top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center bg-white" style={{ zIndex: 9999, opacity: 0.8 }}>
+        <div className="position-fixed top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center bg-white" style={{ zIndex: 9999, opacity: 0.5 }}>
           <div className="spinner-border text-success" role="status">
             <span className="visually-hidden">Cargando...</span>
           </div>
         </div>
       )}
 
-      <main className="flex-grow-1">
+      {/* CONTENEDOR PRINCIPAL ELÁSTICO */}
+      <main className="flex-grow-1 d-flex flex-column m-0 p-0" style={{ backgroundColor: '#f1faf6' }}>
         <Routes>
           <Route path="/" element={<HomeView />} />
           <Route path="/catalogo" element={<CatalogoView addToCart={addToCart} productos={productos} />} />
           <Route path="/nosotros" element={<NosotrosView />} />
           <Route path="/producto/:id" element={<ProductoDetailView productos={productos} addToCart={addToCart} />} />
-          <Route path="/login" element={!isLogged ? <LoginView onLogin={login} /> : <Navigate to="/" />} />
-          <Route path="/register" element={!isLogged ? <RegisterView /> : <Navigate to="/" />} />
+          
+          <Route path="/login" element={<LoginView onLogin={login} />} />
+          <Route path="/register" element={<RegisterView />} />
+          
           <Route path="/perfil" element={isLogged ? <PerfilView /> : <Navigate to="/login" />} />
           <Route path="/historial" element={isLogged ? <HistorialView /> : <Navigate to="/login" />} />
           <Route path="/carrito" element={<CarritoView cart={cart} total={total} removeFromCart={removeFromCart} updateCantidad={updateCantidad} clearCart={clearCart} />} />
@@ -81,7 +90,8 @@ const App = () => {
         </Routes>
       </main>
 
-      <FooterComponent />
+      {/* 🚀 FOOTER EXCLUSIVO: Renderiza el Footer premium SOLO si 'esHome' es verdadero */}
+      {esHome && <FooterComponent />}
     </div>
   );
 }
