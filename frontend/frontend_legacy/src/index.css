@@ -2,7 +2,15 @@
    VARIABLES GLOBALES
    Sistema de diseño unificado — paleta, espaciado, tipografía
    ========================================================= */
-
+html, 
+body, 
+#root {
+  height: 100% !important;
+  min-height: 100vh !important;
+  margin: 0;
+  padding: 0;
+  background-color: var(--green-50) !important; /* 🚀 Si el fondo de tu app es verde claro, el navegador entero debe ser verde claro */
+}
 :root {
   /* Colores primarios */
   --green-900:  #0a2e1e;
@@ -905,7 +913,7 @@ a {
 
 section,
 .container {
-  margin-bottom: var(--space-8);
+  margin-bottom: var(--space-55);
 }
 
 .bg-glass {
@@ -945,4 +953,58 @@ section,
 
 .fade-in {
   animation: fadeIn 0.35s var(--ease) both;
+}
+
+/* Resetea el margen para el Home Hero específicamente */
+.home-hero {
+  margin-bottom: 0 !important;
+  min-height: calc(100vh - 80px); /* Ajusta según el alto de tu navbar */
+  display: flex;
+  align-items: center;
+}
+
+/* Opcional: Si quieres reducir el margen global que está afectando todo */
+.container {
+  margin-bottom: var(--space-4); /* Bajamos de space-8 a space-4 */
+}
+
+/* 1. Forzar al Home Hero a ocupar el espacio correcto sin romper nada */
+.home-hero {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0 !important; /* Matamos el margen molesto */
+  padding: var(--space-6) 0;
+}
+
+/* 2. Achicar el Footer drásticamente */
+footer, 
+.footer {
+  margin-top: auto; /* Truco pro: Empuja el footer al fondo si hay espacio blanco */
+  padding-top: var(--space-4) !important;   /* Reduce el espacio gigante de arriba */
+  padding-bottom: var(--space-4) !important;/* Reduce el espacio gigante de abajo */
+  background-color: var(--gray-900) !important;
+}
+
+/* Reducimos el tamaño de los textos del footer para que se vea compacto */
+footer h5, footer h6 {
+  margin-bottom: var(--space-2) !important;
+  font-size: 1rem !important;
+}
+
+footer p, footer a, footer li {
+  margin-bottom: 0.3rem !important;
+  font-size: 0.85rem !important;
+}
+
+/* Limpieza de paddings excesivos para el Footer */
+footer, .footer {
+  padding-top: var(--space-4) !important;
+  padding-bottom: var(--space-4) !important;
+}
+
+/* Evita que las secciones del home empujen de más */
+.home-hero {
+  margin-bottom: 0 !important;
 }
