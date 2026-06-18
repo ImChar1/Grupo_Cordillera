@@ -2,9 +2,8 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
-import { AuthService } from '../services/AuthService'; // 🔥 IMPORTAMOS EL SERVICIO DE API
+import { AuthService } from '../services/AuthService';
 
-// ── Paleta (coherente con HomeView / NavbarComponent / FooterComponent) ────
 const C = {
   bg:     '#F7F4EF',
   ink:    '#1A1A18',
@@ -17,29 +16,32 @@ const C = {
 };
 
 export const LoginView = ({ onLogin }) => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail]             = useState('');
+  const [password, setPassword]       = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [errorMsg, setErrorMsg] = useState(''); // 🔥 NUEVO: Para mostrar errores del backend
+  const [errorMsg, setErrorMsg]       = useState('');
+  const [loading, setLoading]         = useState(false);
   const navigate = useNavigate();
 
-  // 🔥 NUEVO: Función handleSubmit conectada al backend real
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setErrorMsg(''); // Limpiamos errores anteriores
+    setErrorMsg('');
+    setLoading(true);
 
-    if (email && password) {
-      try {
-        // Hacemos la petición POST al Gateway (8080)
-        const response = await AuthService.login({ email, password });
-        
-        // Si el backend responde 200 OK, pasamos los datos reales y redirigimos
-        onLogin(response.user);
+    try {
+      const response = await AuthService.login({ email, password });
+      onLogin(response.user);
+
+      // ── Redirige según el rol ──────────────────────────────────────
+      if (response.user.rol === 'ADMIN') {
+        navigate('/admin');
+      } else {
         navigate('/');
-      } catch (error) {
-        // Si el backend tira un 401 (Credenciales inválidas), lo mostramos en pantalla
-        setErrorMsg(error.message);
       }
+    } catch (error) {
+      setErrorMsg(error.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -58,7 +60,7 @@ export const LoginView = ({ onLogin }) => {
           width: 100%; font-family: 'Inter', sans-serif; font-size: 15px;
           color: ${C.ink}; background: transparent; border: none;
           border-bottom: 1.5px solid ${C.border}; padding: 10px 2px;
-          outline: none; transition: border-color 0.22s ease;
+          outline: none; transition: border-color 0.22s ease; box-sizing: border-box;
         }
         .cordi-field input::placeholder { color: ${C.light}; }
         .cordi-field input:focus { border-bottom-color: ${C.green2}; }
@@ -78,7 +80,8 @@ export const LoginView = ({ onLogin }) => {
           box-shadow: 0 4px 16px rgba(45,106,79,0.28);
           transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
         }
-        .cordi-submit:hover { background: ${C.green2}; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(45,106,79,0.34); }
+        .cordi-submit:hover:not(:disabled) { background: ${C.green2}; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(45,106,79,0.34); }
+        .cordi-submit:disabled { opacity: 0.65; cursor: not-allowed; }
 
         .cordi-text-link {
           position: relative; color: ${C.green}; font-weight: 700; text-decoration: none;
@@ -92,11 +95,11 @@ export const LoginView = ({ onLogin }) => {
 
         @media (max-width: 900px) {
           .cordi-login-image { display: none !important; }
-          .cordi-login-form { flex-basis: 100% !important; }
+          .cordi-login-form  { flex-basis: 100% !important; }
         }
       `}</style>
 
-      {/* ── PANEL IZQUIERDO — IMAGEN EDITORIAL (desktop) ─────────────── */}
+      {/* ── Panel izquierdo: imagen editorial ─────────────────────────── */}
       <div className="cordi-login-image" style={{ flexBasis: '46%', position: 'relative', overflow: 'hidden' }}>
         <img
           src="https://images.unsplash.com/photo-1556911220-bff31c812dba?w=1200&q=85"
@@ -105,14 +108,14 @@ export const LoginView = ({ onLogin }) => {
         />
         <div style={{
           position: 'absolute', inset: 0,
-          background: 'linear-gradient(180deg, rgba(26,26,24,0.35) 0%, rgba(26,26,24,0.15) 40%, rgba(26,26,24,0.82) 100%)',
+          background: 'linear-gradient(180deg,rgba(26,26,24,.35) 0%,rgba(26,26,24,.15) 40%,rgba(26,26,24,.82) 100%)',
         }} />
 
         <Link to="/" style={{ position: 'absolute', top: 36, left: 40, display: 'flex', alignItems: 'center', gap: 12, textDecoration: 'none' }}>
           <div style={{
             width: 40, height: 40, borderRadius: 11,
-            background: `linear-gradient(135deg, ${C.green} 0%, ${C.green2} 100%)`,
-            display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+            background: `linear-gradient(135deg,${C.green} 0%,${C.green2} 100%)`,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
           }}>
             <img src="/img/logo-claro.png" alt="Grupo Cordillera" style={{ height: 22, width: 'auto', objectFit: 'contain' }} />
           </div>
@@ -122,8 +125,8 @@ export const LoginView = ({ onLogin }) => {
         </Link>
 
         <div style={{ position: 'absolute', bottom: 56, left: 40, right: 40, maxWidth: 420 }}>
-          <p style={{ fontFamily: 'Inter, sans-serif', fontSize: 11, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: C.green2, margin: '0 0 14px 0' }}>
-            Hogar & confort
+          <p style={{ fontFamily: 'Inter, sans-serif', fontSize: 11, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: C.green2, margin: '0 0 14px' }}>
+            Hogar &amp; confort
           </p>
           <h2 style={{ fontFamily: 'Playfair Display, serif', fontSize: 30, fontWeight: 600, color: '#fff', lineHeight: 1.25, margin: 0 }}>
             Cada hogar cuenta una <em style={{ fontStyle: 'italic', color: C.green2, fontWeight: 400 }}>historia</em>. Que la tuya empiece aquí.
@@ -131,24 +134,28 @@ export const LoginView = ({ onLogin }) => {
         </div>
       </div>
 
-      {/* ── PANEL DERECHO — FORMULARIO ───────────────────────────────── */}
+      {/* ── Panel derecho: formulario ──────────────────────────────────── */}
       <div className="cordi-login-form" style={{ flexBasis: '54%', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '64px 8vw' }}>
         <div style={{ width: '100%', maxWidth: 380 }}>
 
-          <p style={{ fontFamily: 'Inter, sans-serif', fontSize: 11, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: C.muted, margin: '0 0 12px 0' }}>
+          <p style={{ fontFamily: 'Inter, sans-serif', fontSize: 11, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: C.muted, margin: '0 0 12px' }}>
             Bienvenido de nuevo
           </p>
-          <h1 style={{ fontFamily: 'Playfair Display, serif', fontSize: 34, fontWeight: 600, color: C.ink, margin: '0 0 10px 0' }}>
+          <h1 style={{ fontFamily: 'Playfair Display, serif', fontSize: 34, fontWeight: 600, color: C.ink, margin: '0 0 10px' }}>
             Inicia sesión
           </h1>
-          <p style={{ fontSize: 14, color: C.muted, lineHeight: 1.6, margin: '0 0 28px 0' }}>
+          <p style={{ fontSize: 14, color: C.muted, lineHeight: 1.6, margin: '0 0 28px' }}>
             Ingresa tus datos para continuar con tu pedido y tu cuenta.
           </p>
 
-          {/* 🔥 BLOQUE DE ERROR: Aparece si el backend nos rechaza */}
           {errorMsg && (
-            <div style={{ background: '#fdeded', color: '#ef5350', padding: '12px', borderRadius: '6px', marginBottom: '20px', fontSize: '14px', fontWeight: '500', border: '1px solid #ef5350' }}>
-              Error: {errorMsg}
+            <div style={{
+              background: '#fdeded', color: '#C0392B',
+              padding: '12px 16px', borderRadius: 8, marginBottom: 20,
+              fontSize: 13, fontWeight: 600, border: '1px solid #f5c6c6',
+              display: 'flex', alignItems: 'center', gap: 8,
+            }}>
+              <span>⚠️</span> {errorMsg}
             </div>
           )}
 
@@ -160,8 +167,9 @@ export const LoginView = ({ onLogin }) => {
                 type="email"
                 placeholder="correo@ejemplo.com"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={e => setEmail(e.target.value)}
                 required
+                autoComplete="email"
               />
             </div>
 
@@ -172,9 +180,10 @@ export const LoginView = ({ onLogin }) => {
                 type={showPassword ? 'text' : 'password'}
                 placeholder="••••••••"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={e => setPassword(e.target.value)}
                 required
                 style={{ paddingRight: 28 }}
+                autoComplete="current-password"
               />
               <button
                 type="button"
@@ -186,8 +195,8 @@ export const LoginView = ({ onLogin }) => {
               </button>
             </div>
 
-            <button type="submit" className="cordi-submit">
-              Entrar
+            <button type="submit" className="cordi-submit" disabled={loading}>
+              {loading ? 'Ingresando...' : 'Entrar'}
             </button>
           </form>
 
