@@ -30,6 +30,7 @@ public class UsuarioServiceTest {
     @InjectMocks
     private UsuarioService usuarioService;
 
+    
     @Test
     void guardarUsuario_FallaCuandoEmailYaExiste() {
         UsuarioModel usuarioNuevo = new UsuarioModel();
