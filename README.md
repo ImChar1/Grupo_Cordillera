@@ -103,7 +103,6 @@ docker compose down
 # Detener Y borrar el volumen (borra todos los datos de la BD)
 docker compose down -v
 ```
-
 ---
 
 ## 4. Verificar que todo funciona

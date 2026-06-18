@@ -51,7 +51,6 @@ const App = () => {
 
   return (
     <div className="d-flex flex-column min-vh-100 bg-light">
-
       <NavbarComponent
         isLogged={isLogged}
         user={user}

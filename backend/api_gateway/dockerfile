@@ -15,6 +15,5 @@ COPY --from=builder /build/target/*.jar app.jar
 # Exponemos el puerto
 EXPOSE 8080
 
-# ESTA ES LA LÍNEA QUE FALTABA:
 # Aquí le indicamos a Docker que ejecute la aplicación Spring Boot
 ENTRYPOINT ["java", "-jar", "app.jar"]
