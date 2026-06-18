@@ -1,6 +1,7 @@
 FROM mariadb:11
 
-COPY infra/db/script_DDL_usuario.sql  /docker-entrypoint-initdb.d/01_schema.sql
-COPY infra//db/script_DML_usuario.sql /docker-entrypoint-initdb.d/02_seed.sql
+# Como ya estamos en ./infra/db-usuarios, buscamos los archivos directamente ahí
+COPY script_DDL_usuario.sql /docker-entrypoint-initdb.d/01_schema.sql
+COPY script_DML_usuario.sql /docker-entrypoint-initdb.d/02_seed.sql
 
 VOLUME /var/lib/mysql

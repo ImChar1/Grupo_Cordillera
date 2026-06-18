@@ -1,5 +1,6 @@
 package com.cordillera.ms_usuarios.controller;
 
+import com.cordillera.ms_usuarios.dto.LoginRequest;
 import com.cordillera.ms_usuarios.model.UsuarioModel;
 import com.cordillera.ms_usuarios.service.UsuarioService;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +16,19 @@ import java.util.List;
 public class UsuarioController {
 
     private final UsuarioService usuarioService;
+
+    // 🔥 NUEVO: Endpoint de Login
+    // POST: http://localhost:8082/api/usuarios/login
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody LoginRequest request) {
+        try {
+            UsuarioModel usuarioValidado = usuarioService.login(request.getEmail(), request.getPassword());
+            return ResponseEntity.ok(usuarioValidado);
+        } catch (RuntimeException e) {
+            // Retorna un HTTP 401 si falla la validación
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+        }
+    }
 
     // 1. Obtener todos los usuarios activos
     // GET: http://localhost:8082/api/usuarios

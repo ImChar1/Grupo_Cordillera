@@ -1,6 +1,6 @@
 FROM mariadb:11
 
-COPY infra/db/script_DDL_producto.sql  /docker-entrypoint-initdb.d/01_schema.sql
-COPY infra//db/script_DML_producto.sql /docker-entrypoint-initdb.d/02_seed.sql
+COPY script_DDL_producto.sql /docker-entrypoint-initdb.d/01_schema.sql
+COPY script_DML_producto.sql /docker-entrypoint-initdb.d/02_seed.sql
 
 VOLUME /var/lib/mysql

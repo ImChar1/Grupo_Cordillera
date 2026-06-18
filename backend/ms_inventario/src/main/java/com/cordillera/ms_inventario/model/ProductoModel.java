@@ -1,13 +1,13 @@
 package com.cordillera.ms_inventario.model;
 
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.Builder;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import java.math.BigDecimal; // <-- IMPORTANTE: Añadimos la clase para manejo de dinero
 import java.time.LocalDateTime;
 
 @Data
@@ -26,7 +26,11 @@ public class ProductoModel {
     private String categoria;
     private String marca;
     private String sku;           // código único del producto (ej: "PROD-001")
-    private Double precio;
+    
+    // ✅ SOLUCIÓN: Cambiado de Double a BigDecimal mapeando explícitamente el tipo DECIMAL de la BD
+    @Column(name = "precio", precision = 10, scale = 2)
+    private BigDecimal precio;
+    
     private Integer stock;
     private Integer stockMinimo;  // para alertas de reabastecimiento
 
@@ -40,7 +44,4 @@ public class ProductoModel {
 
     @Builder.Default
     private Boolean activo = true;
-
 }
-
-

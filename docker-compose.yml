@@ -1,4 +1,6 @@
-version: '3.8'
+# ==========================================
+# GRUPO CORDILLERA - DOCKER COMPOSE
+# ==========================================
 
 services:
   # ==========================================
@@ -6,30 +8,30 @@ services:
   # ==========================================
   db-inventario:
     build: ./infra/db-inventario
-    container_name: mariadb-inventario
+    container_name: db-inventario
     environment:
       MARIADB_ROOT_PASSWORD: ${DB_INVENTARIO_ROOT_PASSWORD}
       MARIADB_DATABASE: ${DB_INVENTARIO_NAME}
       MARIADB_USER: ${DB_INVENTARIO_USER}
       MARIADB_PASSWORD: ${DB_INVENTARIO_PASSWORD}
     ports:
-      - "3306:3306" # Expuesto al puerto 3306 de tu PC
+      - "3306:3306"
     volumes:
       - inventario_data:/var/lib/mysql
 
   # ==========================================
-  # 2. BASE DE DATOS: USUARIOS/VENTAS
+  # 2. BASE DE DATOS: USUARIOS
   # ==========================================
   db-usuarios:
     build: ./infra/db-usuarios
-    container_name: mariadb-usuarios
+    container_name: db-usuarios
     environment:
       MARIADB_ROOT_PASSWORD: ${DB_USUARIOS_ROOT_PASSWORD}
       MARIADB_DATABASE: ${DB_USUARIOS_NAME}
       MARIADB_USER: ${DB_USUARIOS_USER}
       MARIADB_PASSWORD: ${DB_USUARIOS_PASSWORD}
     ports:
-      - "3307:3306" # OJO: Expuesto al puerto 3307 para que no choque con el otro
+      - "3307:3306"
     volumes:
       - usuarios_data:/var/lib/mysql
 
@@ -37,15 +39,16 @@ services:
   # 3. MICROSERVICIO: INVENTARIO
   # ==========================================
   ms-inventario:
-    build: ./ms-inventario
+    build: ./backend/ms_inventario
     container_name: ms-inventario
     ports:
       - "8081:8081"
     environment:
-      # Apunta al nombre del contenedor de inventario
-      DB_URL: jdbc:mariadb://db_inventario:3306/${DB_INVENTARIO_NAME}
+      DB_URL: jdbc:mysql://db-inventario:3306/${DB_INVENTARIO_NAME}
       DB_USER: ${DB_INVENTARIO_USER}
       DB_PASSWORD: ${DB_INVENTARIO_PASSWORD}
+      SPRING_DATASOURCE_USERNAME: ${DB_INVENTARIO_USER}
+      SPRING_DATASOURCE_PASSWORD: ${DB_INVENTARIO_PASSWORD}
       SWAGGER_ENABLED: ${SWAGGER_ENABLED:-true}
     depends_on:
       - db-inventario
@@ -54,47 +57,61 @@ services:
   # 4. MICROSERVICIO: USUARIOS
   # ==========================================
   ms-usuarios:
-    build: ./ms-usuarios
+    build: ./backend/ms_usuarios
     container_name: ms-usuarios
     ports:
       - "8082:8082"
     environment:
-      # Apunta al nombre del contenedor de usuarios
-      DB_URL: jdbc:mariadb://db-usuarios:3306/${DB_USUARIOS_NAME}
+      DB_URL: jdbc:mysql://db-usuarios:3306/${DB_USUARIOS_NAME}
       DB_USER: ${DB_USUARIOS_USER}
       DB_PASSWORD: ${DB_USUARIOS_PASSWORD}
+      SPRING_DATASOURCE_USERNAME: ${DB_USUARIOS_USER}
+      SPRING_DATASOURCE_PASSWORD: ${DB_USUARIOS_PASSWORD}
       SWAGGER_ENABLED: ${SWAGGER_ENABLED:-true}
     depends_on:
       - db-usuarios
 
   # ==========================================
-  # 5. API GATEWAY
+  # 5. API GATEWAY (Configuración Forzada Nivel Dios)
   # ==========================================
   api-gateway:
-    build: ./api-gateway
+    build: ./backend/api_gateway
     container_name: api-gateway
     ports:
       - "8080:8080"
     environment:
-      - SPRING_CLOUD_GATEWAY_ROUTES_0_URI=http://ms-inventario:8081
-      - SPRING_CLOUD_GATEWAY_ROUTES_1_URI=http://ms-usuarios:8082
+      SPRING_APPLICATION_NAME: api-gateway
+      SERVER_PORT: 8080
+      
+      # Enrutamiento explícito para ms-inventario
+      SPRING_CLOUD_GATEWAY_ROUTES_0_ID: ms-inventario
+      SPRING_CLOUD_GATEWAY_ROUTES_0_URI: http://ms-inventario:8081
+      SPRING_CLOUD_GATEWAY_ROUTES_0_PREDICATES_0: Path=/api/v1/productos/**
+      
+      # Enrutamiento explícito para ms-usuarios
+      SPRING_CLOUD_GATEWAY_ROUTES_1_ID: ms-usuarios
+      SPRING_CLOUD_GATEWAY_ROUTES_1_URI: http://ms-usuarios:8082
+      SPRING_CLOUD_GATEWAY_ROUTES_1_PREDICATES_0: Path=/api/v1/usuarios/**
+      
+      # Configuración de CORS Global desde las variables
+      SPRING_CLOUD_GATEWAY_GLOBALCORS_CORS_CONFIGURATIONS_[/**]_ALLOWED_ORIGINS: "http://localhost:3000,http://localhost:5173"
+      SPRING_CLOUD_GATEWAY_GLOBALCORS_CORS_CONFIGURATIONS_[/**]_ALLOWED_METHODS: "GET,POST,PUT,DELETE,OPTIONS"
+      SPRING_CLOUD_GATEWAY_GLOBALCORS_CORS_CONFIGURATIONS_[/**]_ALLOWED_HEADERS: "*"
     depends_on:
       - ms-inventario
       - ms-usuarios
-  
+
   # ==========================================
-  # 5. FRONTEND (react/Vite)
+  # 6. FRONTEND (legacy)
   # ==========================================
   frontend:
-    build: ./frontend # La ruta a tu carpeta frontend
+    build: ./frontend/frontend_legacy
     container_name: frontend_react
     ports:
-      # Mapeamos el puerto 3000 de tu PC al puerto 80 del Nginx
       - "3000:80" 
     depends_on:
       - api-gateway
       
-# Volúmenes nombrados independientes
 volumes:
   inventario_data:
   usuarios_data:

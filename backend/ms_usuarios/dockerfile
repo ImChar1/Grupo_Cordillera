@@ -1,15 +1,35 @@
-# Multistage
-# Stage 1: se encargará de crear el .jar
+# ========================================================
+# Stage 1: Compilación y empaquetado del .jar con Maven
+# ========================================================
 FROM maven:3.9-eclipse-temurin-21 AS builder
 WORKDIR /build
+
+# Copiamos el archivo de configuración de dependencias
 COPY pom.xml .
+
+# Copiamos el código fuente del proyecto
 COPY src ./src
+
+# Compilamos el proyecto omitiendo los tests para acelerar el build
 RUN mvn clean package -DskipTests
 
-# Stage 2: ejecutar la api
+# ========================================================
+# Stage 2: Entorno de ejecución de la API
+# ========================================================
 FROM eclipse-temurin:21-jdk
 WORKDIR /app
+
+# Copiamos el archivo .jar generado en la etapa anterior
 COPY --from=builder /build/target/*.jar app.jar
+
+# Copiamos el script de entrada (Asegúrate de haber hecho el 'cp' denante)
 COPY entrypoint.sh /entrypoint.sh
+
+# Otorgamos permisos de ejecución al script para evitar errores de "Permission denied"
+RUN chmod +x /entrypoint.sh
+
+# Exponemos el puerto del microservicio de usuarios
 EXPOSE 8082
-ENTRYPOINT ["java","-jar","app.jar"]
+
+# Ejecutamos la aplicación
+ENTRYPOINT ["java", "-jar", "app.jar"]
