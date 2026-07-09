@@ -79,4 +79,144 @@ public class UsuarioServiceTest {
         verify(passwordEncoder, times(1)).encode("claveSecreta123");
         verify(usuarioRepository, times(1)).save(usuarioNuevo);
     }
+
+    // ─── LOGIN ──────────────────────────────────────────────────
+
+    @Test
+    void login_Exito() {
+        UsuarioModel usuarioExistente = new UsuarioModel();
+        usuarioExistente.setId(1);
+        usuarioExistente.setEmail("carlos@cordillera.cl");
+        usuarioExistente.setPassword("hash_encriptado_abc123");
+
+        when(usuarioRepository.findByEmailAndActivoTrue("carlos@cordillera.cl"))
+            .thenReturn(java.util.Optional.of(usuarioExistente));
+        when(passwordEncoder.matches("12345", "hash_encriptado_abc123")).thenReturn(true);
+
+        UsuarioModel resultado = usuarioService.login("carlos@cordillera.cl", "12345");
+
+        assertNotNull(resultado);
+        assertEquals(1, resultado.getId());
+    }
+
+    @Test
+    void login_FallaCuandoElUsuarioNoExisteOEstaInactivo() {
+        when(usuarioRepository.findByEmailAndActivoTrue("nadie@cordillera.cl"))
+            .thenReturn(java.util.Optional.empty());
+
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
+            usuarioService.login("nadie@cordillera.cl", "12345");
+        });
+
+        assertEquals("Credenciales inválidas o el usuario no existe/está inactivo.", exception.getMessage());
+    }
+
+    @Test
+    void login_FallaCuandoLaContraseñaEsIncorrecta() {
+        UsuarioModel usuarioExistente = new UsuarioModel();
+        usuarioExistente.setEmail("carlos@cordillera.cl");
+        usuarioExistente.setPassword("hash_encriptado_abc123");
+
+        when(usuarioRepository.findByEmailAndActivoTrue("carlos@cordillera.cl"))
+            .thenReturn(java.util.Optional.of(usuarioExistente));
+        when(passwordEncoder.matches("claveIncorrecta", "hash_encriptado_abc123")).thenReturn(false);
+
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
+            usuarioService.login("carlos@cordillera.cl", "claveIncorrecta");
+        });
+
+        assertEquals("Credenciales inválidas.", exception.getMessage());
+    }
+
+    // ─── UPDATE ─────────────────────────────────────────────────
+
+    @Test
+    void updateUsuario_Exito_SinCambiarPassword() {
+        UsuarioModel existente = new UsuarioModel();
+        existente.setId(2);
+        existente.setNombreCompleto("Nombre Viejo");
+        existente.setEmail("viejo@cordillera.cl");
+        existente.setPassword("hash_original");
+
+        UsuarioModel datosNuevos = new UsuarioModel();
+        datosNuevos.setId(2);
+        datosNuevos.setNombreCompleto("Nombre Nuevo");
+        datosNuevos.setEmail("nuevo@cordillera.cl");
+        datosNuevos.setRol("ADMIN");
+        datosNuevos.setSucursal("Casa Matriz");
+        // password vacío/no enviado → no debe cambiar
+
+        when(usuarioRepository.findById(2)).thenReturn(java.util.Optional.of(existente));
+        when(usuarioRepository.save(any(UsuarioModel.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        UsuarioModel resultado = usuarioService.updateUsuario(datosNuevos);
+
+        assertEquals("Nombre Nuevo", resultado.getNombreCompleto());
+        assertEquals("nuevo@cordillera.cl", resultado.getEmail());
+        assertEquals("hash_original", resultado.getPassword()); // no cambió
+        verify(passwordEncoder, never()).encode(any());
+    }
+
+    @Test
+    void updateUsuario_EncriptaLaNuevaPassword_SiSeEnvia() {
+        UsuarioModel existente = new UsuarioModel();
+        existente.setId(3);
+        existente.setPassword("hash_viejo");
+
+        UsuarioModel datosNuevos = new UsuarioModel();
+        datosNuevos.setId(3);
+        datosNuevos.setPassword("nuevaClave123");
+
+        when(usuarioRepository.findById(3)).thenReturn(java.util.Optional.of(existente));
+        when(passwordEncoder.encode("nuevaClave123")).thenReturn("hash_nuevo");
+        when(usuarioRepository.save(any(UsuarioModel.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        UsuarioModel resultado = usuarioService.updateUsuario(datosNuevos);
+
+        assertEquals("hash_nuevo", resultado.getPassword());
+        verify(passwordEncoder, times(1)).encode("nuevaClave123");
+    }
+
+    @Test
+    void updateUsuario_FallaCuandoNoExiste() {
+        UsuarioModel datosNuevos = new UsuarioModel();
+        datosNuevos.setId(999);
+
+        when(usuarioRepository.findById(999)).thenReturn(java.util.Optional.empty());
+
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
+            usuarioService.updateUsuario(datosNuevos);
+        });
+
+        assertEquals("Usuario no encontrado con id: 999", exception.getMessage());
+    }
+
+    // ─── DESACTIVAR ─────────────────────────────────────────────
+
+    @Test
+    void desactivarUsuario_Exito() {
+        UsuarioModel usuario = new UsuarioModel();
+        usuario.setId(4);
+        usuario.setActivo(true);
+
+        when(usuarioRepository.findById(4)).thenReturn(java.util.Optional.of(usuario));
+        when(usuarioRepository.save(any(UsuarioModel.class))).thenReturn(usuario);
+
+        String resultado = usuarioService.desactivarUsuario(4);
+
+        assertEquals("Usuario desactivado correctamente. Ya no podrá iniciar sesión.", resultado);
+        assertEquals(false, usuario.getActivo());
+        verify(usuarioRepository, times(1)).save(usuario);
+    }
+
+    @Test
+    void desactivarUsuario_FallaCuandoNoExiste() {
+        when(usuarioRepository.findById(999)).thenReturn(java.util.Optional.empty());
+
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
+            usuarioService.desactivarUsuario(999);
+        });
+
+        assertEquals("Usuario no encontrado con id: 999", exception.getMessage());
+    }
 }
