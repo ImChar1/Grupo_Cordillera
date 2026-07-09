@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
+import { AuthService } from '../services/AuthService'; // ✅ Usamos el servicio centralizado
 
-// ── Paleta (coherente con HomeView / NavbarComponent / FooterComponent / LoginView) ──
 const C = {
   bg:     '#F7F4EF',
   ink:    '#1A1A18',
@@ -16,15 +16,39 @@ const C = {
 };
 
 export const RegisterView = () => {
-  const [nombre, setNombre] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [nombre, setNombre]         = useState('');
+  const [email, setEmail]           = useState('');
+  const [password, setPassword]     = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading]       = useState(false);
+  const [errorMsg, setErrorMsg]     = useState('');
+  const [successMsg, setSuccessMsg] = useState('');
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    navigate('/login');
+    setErrorMsg('');
+    setSuccessMsg('');
+    setLoading(true);
+
+    try {
+      // ✅ Delegamos toda la lógica al AuthService
+      // AuthService.register genera el username único y arma el payload correcto
+      await AuthService.register({
+        nombreCompleto: nombre,
+        email,
+        password,
+        // rut omitido → el servicio envía null, la BD lo acepta si el campo no tiene NOT NULL
+      });
+
+      setSuccessMsg('¡Registro exitoso! Redirigiendo al login...');
+      setTimeout(() => navigate('/login'), 2000);
+    } catch (error) {
+      console.error('Error en el registro:', error);
+      setErrorMsg(error.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -62,11 +86,11 @@ export const RegisterView = () => {
           box-shadow: 0 4px 16px rgba(45,106,79,0.28);
           transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
         }
-        .cordi-submit:hover { background: ${C.green2}; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(45,106,79,0.34); }
+        .cordi-submit:hover:not(:disabled) { background: ${C.green2}; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(45,106,79,0.34); }
+        .cordi-submit:disabled { opacity: 0.65; cursor: not-allowed; }
 
         .cordi-text-link {
-          position: relative; color: ${C.green}; font-weight: 700;
-          text-decoration: none;
+          position: relative; color: ${C.green}; font-weight: 700; text-decoration: none;
         }
         .cordi-text-link::after {
           content: ''; position: absolute; left: 0; bottom: -2px;
@@ -83,26 +107,31 @@ export const RegisterView = () => {
 
       {/* ── PANEL IZQUIERDO — FORMULARIO ─────────────────────────────── */}
       <div className="cordi-register-form" style={{
-        flexBasis: '54%', display: 'flex', alignItems: 'center', justifyContent: 'center',
-        padding: '64px 8vw', order: 1,
+        flexBasis: '54%', display: 'flex', alignItems: 'center',
+        justifyContent: 'center', padding: '64px 8vw', order: 1,
       }}>
         <div style={{ width: '100%', maxWidth: 380 }}>
 
-          <p style={{
-            fontFamily: 'Inter, sans-serif', fontSize: 11, fontWeight: 700,
-            letterSpacing: '0.14em', textTransform: 'uppercase', color: C.muted, margin: '0 0 12px 0',
-          }}>
+          <p style={{ fontFamily: 'Inter, sans-serif', fontSize: 11, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: C.muted, margin: '0 0 12px 0' }}>
             Únete a Grupo Cordillera
           </p>
-          <h1 style={{
-            fontFamily: 'Playfair Display, serif', fontSize: 34, fontWeight: 600,
-            color: C.ink, margin: '0 0 10px 0',
-          }}>
+          <h1 style={{ fontFamily: 'Playfair Display, serif', fontSize: 34, fontWeight: 600, color: C.ink, margin: '0 0 10px 0' }}>
             Crea tu cuenta
           </h1>
           <p style={{ fontSize: 14, color: C.muted, lineHeight: 1.6, margin: '0 0 38px 0' }}>
             Regístrate para guardar tus favoritos y agilizar tus próximas compras.
           </p>
+
+          {errorMsg && (
+            <div style={{ padding: '12px 16px', background: '#FDE8E8', color: '#E02424', border: '1px solid #F8B4B4', borderRadius: '8px', marginBottom: '20px', fontSize: '14px', fontWeight: 500 }}>
+              {errorMsg}
+            </div>
+          )}
+          {successMsg && (
+            <div style={{ padding: '12px 16px', background: '#E6F4EA', color: '#137333', border: '1px solid #CEEAD6', borderRadius: '8px', marginBottom: '20px', fontSize: '14px', fontWeight: 500 }}>
+              {successMsg}
+            </div>
+          )}
 
           <form onSubmit={handleSubmit}>
             <div className="cordi-field">
@@ -150,8 +179,8 @@ export const RegisterView = () => {
               </button>
             </div>
 
-            <button type="submit" className="cordi-submit">
-              Registrarse
+            <button type="submit" className="cordi-submit" disabled={loading}>
+              {loading ? 'Registrando...' : 'Registrarse'}
             </button>
           </form>
 
@@ -171,19 +200,10 @@ export const RegisterView = () => {
           alt="Cocina Grupo Cordillera"
           style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
         />
-        <div style={{
-          position: 'absolute', inset: 0,
-          background: 'linear-gradient(180deg, rgba(26,26,24,0.35) 0%, rgba(26,26,24,0.15) 40%, rgba(26,26,24,0.82) 100%)',
-        }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(26,26,24,0.35) 0%, rgba(26,26,24,0.15) 40%, rgba(26,26,24,0.82) 100%)' }} />
 
-        <Link to="/" style={{
-          position: 'absolute', top: 36, left: 40, display: 'flex', alignItems: 'center', gap: 12, textDecoration: 'none',
-        }}>
-          <div style={{
-            width: 40, height: 40, borderRadius: 11,
-            background: `linear-gradient(135deg, ${C.green} 0%, ${C.green2} 100%)`,
-            display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-          }}>
+        <Link to="/" style={{ position: 'absolute', top: 36, left: 40, display: 'flex', alignItems: 'center', gap: 12, textDecoration: 'none' }}>
+          <div style={{ width: 40, height: 40, borderRadius: 11, background: `linear-gradient(135deg, ${C.green} 0%, ${C.green2} 100%)`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
             <img src="/img/logo-claro.png" alt="Grupo Cordillera" style={{ height: 22, width: 'auto', objectFit: 'contain' }} />
           </div>
           <span style={{ fontFamily: 'Playfair Display, serif', fontSize: 17, color: '#fff' }}>
@@ -192,16 +212,10 @@ export const RegisterView = () => {
         </Link>
 
         <div style={{ position: 'absolute', bottom: 56, left: 40, right: 40, maxWidth: 420 }}>
-          <p style={{
-            fontFamily: 'Inter, sans-serif', fontSize: 11, fontWeight: 700,
-            letterSpacing: '0.14em', textTransform: 'uppercase', color: C.green2, margin: '0 0 14px 0',
-          }}>
+          <p style={{ fontFamily: 'Inter, sans-serif', fontSize: 11, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: C.green2, margin: '0 0 14px 0' }}>
             Hogar & confort
           </p>
-          <h2 style={{
-            fontFamily: 'Playfair Display, serif', fontSize: 30, fontWeight: 600,
-            color: '#fff', lineHeight: 1.25, margin: 0,
-          }}>
+          <h2 style={{ fontFamily: 'Playfair Display, serif', fontSize: 30, fontWeight: 600, color: '#fff', lineHeight: 1.25, margin: 0 }}>
             Tu hogar, tu próximo <em style={{ fontStyle: 'italic', color: C.green2, fontWeight: 400 }}>capítulo</em>.
           </h2>
         </div>

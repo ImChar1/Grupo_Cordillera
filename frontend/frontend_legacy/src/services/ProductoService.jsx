@@ -1,5 +1,6 @@
-// Apuntamos directo al API Gateway en el puerto 8080
-const API_URL = 'http://localhost:8080/api/v1/productos';
+// URL relativa — Nginx hace el proxy a api-gateway:8080 internamente
+// En desarrollo local directo (sin Docker) también funciona si el gateway corre en :8080
+const API_URL = '/api/v1/productos';
 
 export const ProductoService = {
     getAll: async () => {
@@ -35,4 +36,4 @@ export const ProductoService = {
         if (!res.ok) throw new Error("Error eliminando producto");
         return res.text();
     }
-}
+};
