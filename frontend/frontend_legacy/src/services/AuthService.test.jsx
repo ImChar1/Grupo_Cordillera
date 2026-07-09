@@ -1,21 +1,23 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { AuthService } from './AuthService';
 
-const API_URL = 'http://localhost:8080/api/v1/usuarios';
-
 describe('AuthService', () => {
   beforeEach(() => {
     global.fetch = vi.fn();
   });
 
   describe('login', () => {
-    it('devuelve token simulado y el usuario tal como lo entrega el backend', async () => {
+    it('devuelve token y usuario "safe" (sin password) cuando las credenciales son correctas', async () => {
       const usuarioBackend = {
         id: 1,
         username: 'carlos123',
+        nombreCompleto: 'Carlos Pérez',
         email: 'carlos@cordillera.cl',
+        rut: '11.111.111-1',
         rol: 'VENDEDOR',
+        sucursal: 'Casa Matriz',
         activo: true,
+        password: 'hash_no_deberia_llegar_al_front',
       };
 
       global.fetch.mockResolvedValueOnce({
@@ -29,19 +31,31 @@ describe('AuthService', () => {
       });
 
       expect(global.fetch).toHaveBeenCalledWith(
-        `${API_URL}/login`,
-        {
+        '/api/v1/usuarios/login',
+        expect.objectContaining({
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email: 'carlos@cordillera.cl', password: '12345' }),
-        }
+        })
       );
 
-      expect(resultado.token).toBe('real-connection-token');
-      expect(resultado.user).toEqual(usuarioBackend);
+      expect(resultado.token).toBe('session-token');
+      expect(resultado.user).toEqual({
+        id: 1,
+        username: 'carlos123',
+        nombreCompleto: 'Carlos Pérez',
+        email: 'carlos@cordillera.cl',
+        rut: '11.111.111-1',
+        rol: 'VENDEDOR',
+        sucursal: 'Casa Matriz',
+        activo: true,
+      });
+
+      // El objeto "safe" nunca debe filtrar la contraseña al front
+      expect(resultado.user.password).toBeUndefined();
     });
 
-    it('lanza el error tal cual lo entrega el backend cuando las credenciales son inválidas', async () => {
+    it('lanza un error con el mensaje del backend cuando las credenciales son inválidas', async () => {
       global.fetch.mockResolvedValueOnce({
         ok: false,
         text: async () => 'Credenciales inválidas.',
@@ -52,7 +66,7 @@ describe('AuthService', () => {
       ).rejects.toThrow('Credenciales inválidas.');
     });
 
-    it('usa el mensaje por defecto "Error en la autenticación" si el backend no entrega texto', async () => {
+    it('usa un mensaje por defecto si el backend no entrega texto de error', async () => {
       global.fetch.mockResolvedValueOnce({
         ok: false,
         text: async () => '',
@@ -60,49 +74,54 @@ describe('AuthService', () => {
 
       await expect(
         AuthService.login({ email: 'x@x.cl', password: 'x' })
-      ).rejects.toThrow('Error en la autenticación');
-    });
-
-    it('re-lanza el error si fetch falla por red (ej: backend caído)', async () => {
-      global.fetch.mockRejectedValueOnce(new Error('Failed to fetch'));
-
-      await expect(
-        AuthService.login({ email: 'x@x.cl', password: 'x' })
-      ).rejects.toThrow('Failed to fetch');
+      ).rejects.toThrow('Credenciales inválidas. Verifica tu correo y contraseña.');
     });
   });
 
   describe('register', () => {
-    it('envía el payload tal cual fue recibido, sin transformarlo', async () => {
-      const userData = {
-        username: 'nasty',
+    it('genera un username único a partir del email y envía el payload correcto', async () => {
+      global.fetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ id: 5, username: 'nasty_12345' }),
+      });
+
+      await AuthService.register({
         email: 'nasty@cordillera.cl',
         password: 'claveSecreta123',
         nombreCompleto: 'Nasty Astudillo',
-      };
-
-      global.fetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({ id: 5, ...userData }),
       });
 
-      await AuthService.register(userData);
+      const [url, options] = global.fetch.mock.calls[0];
+      const bodyEnviado = JSON.parse(options.body);
 
-      expect(global.fetch).toHaveBeenCalledWith(API_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(userData),
-      });
+      expect(url).toBe('/api/v1/usuarios');
+      expect(bodyEnviado.username).toMatch(/^nasty_\d{5}$/);
+      expect(bodyEnviado.rol).toBe('TRABAJADOR'); // valor por defecto
+      expect(bodyEnviado.sucursal).toBe('Casa Matriz'); // valor por defecto
+      expect(bodyEnviado.activo).toBe(true);
     });
 
-    it('lanza "Error al registrar el usuario" cuando el backend responde con error', async () => {
+    it('usa el mensaje de error del JSON del backend cuando el registro falla (ej: email duplicado)', async () => {
       global.fetch.mockResolvedValueOnce({
         ok: false,
+        json: async () => ({ message: 'El correo electrónico ya está registrado' }),
       });
 
       await expect(
         AuthService.register({ email: 'repetido@cordillera.cl', password: '123' })
-      ).rejects.toThrow('Error al registrar el usuario');
+      ).rejects.toThrow('El correo electrónico ya está registrado');
+    });
+
+    it('usa el texto plano de la respuesta si el backend no devuelve JSON válido', async () => {
+      global.fetch.mockResolvedValueOnce({
+        ok: false,
+        json: async () => { throw new Error('no es JSON'); },
+        text: async () => 'Error interno del servidor',
+      });
+
+      await expect(
+        AuthService.register({ email: 'x@x.cl', password: '123' })
+      ).rejects.toThrow('Error interno del servidor');
     });
   });
 });
