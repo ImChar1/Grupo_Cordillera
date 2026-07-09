@@ -1,5 +1,3 @@
-
--- Usamos la base de datos correcta por seguridad
 USE bd_cordillera_inventario;
 
 CREATE TABLE IF NOT EXISTS productos (
@@ -9,6 +7,7 @@ CREATE TABLE IF NOT EXISTS productos (
     categoria VARCHAR(100),
     marca VARCHAR(100),
     sku VARCHAR(50) UNIQUE NOT NULL,
+    imagen VARCHAR(500),
     precio DECIMAL(10, 2) NOT NULL,
     stock INT NOT NULL DEFAULT 0,
     stock_minimo INT NOT NULL DEFAULT 5,

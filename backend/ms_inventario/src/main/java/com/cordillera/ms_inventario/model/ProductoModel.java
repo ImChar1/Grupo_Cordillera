@@ -26,7 +26,11 @@ public class ProductoModel {
     private String categoria;
     private String marca;
     private String sku;           // código único del producto (ej: "PROD-001")
-    
+
+    // URL de la foto del producto (ej: Unsplash u otro hosting de imágenes)
+    @Column(name = "imagen", length = 500)
+    private String imagen;
+
     // ✅ SOLUCIÓN: Cambiado de Double a BigDecimal mapeando explícitamente el tipo DECIMAL de la BD
     @Column(name = "precio", precision = 10, scale = 2)
     private BigDecimal precio;
